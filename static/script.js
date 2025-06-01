@@ -5,7 +5,7 @@ function searchDeals() {
 
   container.innerHTML = "<p>Loading...</p>";
 
-  fetch(`https://your-backend-name.onrender.com/search?q=${encodeURIComponent(query)}`)
+  fetch("https://ai-voice-deal-finder.onrender.com//search?q=" + encodeURIComponent(query))
     .then(res => res.json())
     .then(data => {
       container.innerHTML = "";
