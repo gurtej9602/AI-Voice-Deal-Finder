@@ -1,12 +1,13 @@
-import os
 from flask import Flask, request, jsonify, render_template
-import requests
 from flask_cors import CORS
+import os
+import requests
 from ai_engine import process_query
 
 app = Flask(__name__, static_url_path='/static')
-CORS(app)
+CORS(app)  # ✅ Enable CORS for all routes
 
+# Replace this with your actual key and host from RapidAPI
 RAPIDAPI_KEY = "ca648c7816msh59a32159118ba12p187562jsn9a6181e78fac"
 RAPIDAPI_HOST = "real-time-amazon-data.p.rapidapi.com"
 
@@ -22,7 +23,7 @@ def search():
 
     processed_query = process_query(query)
 
-    url = "https://real-time-amazon-data.p.rapidapi.com/search"
+    url = f"https://{RAPIDAPI_HOST}/search"
     headers = {
         "X-RapidAPI-Key": RAPIDAPI_KEY,
         "X-RapidAPI-Host": RAPIDAPI_HOST
@@ -61,14 +62,17 @@ def search():
                     "delivery": delivery or "Not listed"
                 })
 
+        # Sort: best rated + delivery available
         enriched.sort(key=lambda x: (-x["rating"], x["delivery"] == "Not listed"))
+
         return jsonify(enriched[:5])
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({
+            "error": str(e),
+            "note": "Outer exception block"
+        }), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5000))  # ✅ important for Render
     app.run(debug=True, host='0.0.0.0', port=port)
